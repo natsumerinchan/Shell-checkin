@@ -1,0 +1,40 @@
+name: Checkin
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+  pull_request:
+  schedule:
+    - cron: '0 0 * * *' 
+
+permissions: {}
+
+jobs:
+  checkin:
+    runs-on: ubuntu-latest
+    steps:
+    - name : Checkout
+      uses: actions/checkout@v3
+
+    - name: Setup Environment
+      run: |
+        sudo apt update
+        sudo apt install curl jq
+
+    - name: Checkin GLaDOS
+      run: |
+        if [ ! -z "${{ secrets.GLaDOS_CONF }}" ]; then
+          rm ./GLaDOS-checkin.sh.conf
+          echo ${{ secrets.GLaDOS_CONF }} | base64 --decode > ./GLaDOS-checkin.sh.conf
+          bash ./GLaDOS-checkin.sh
+        fi
+
+    - name: Checkin VikACG
+      run: |
+        if [ ! -z "${{ secrets.VikACG_CONF }}" ]; then
+          rm ./VikACG-checkin.sh.conf
+          echo ${{ secrets.VikACG_CONF }} | base64 --decode > ./VikACG-checkin.sh.conf
+          bash ./VikACG-checkin.sh
+        fi
